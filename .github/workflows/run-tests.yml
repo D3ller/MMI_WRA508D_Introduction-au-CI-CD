@@ -18,6 +18,13 @@ jobs:
       - name: Install dependencies
         run: composer install --no-progress --prefer-dist
 
+      - name: Dump environment variables for production
+        run: |
+          composer dump-env prod
+        env:
+          APP_ENV: prod
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+
       - name: Run PHP-CS-Fixer
         run: ./vendor/bin/php-cs-fixer fix --dry-run --diff
 
@@ -33,3 +40,9 @@ jobs:
       - name: Audit de sécurité
         run: composer audit --format=json --no-interaction
         continue-on-error: true # Permettre au CI de continuer même si des vulnérabilités sont détectées
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: symfony-artifact
+          path: symfony-artifact-r1.tar.gz
